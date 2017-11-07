@@ -1,0 +1,29 @@
+# These functions are almost invariably used only interactively,
+# thus they go into `.bashrc`.
+
+logb() {        # brief graph of current or specified branches
+    # Use `-S` in less to switch to wrapped lines instead of sideways scrolling
+    LESS="$LESS -SR" \
+    git log --graph --abbrev-commit --pretty=oneline --decorate=short "$@"
+}
+
+logab() {       # brief graph of all branches
+    # XXX Needs to drop --exclude on earlier versions of Git
+    logb --all --exclude=refs/notes/* "$@"
+}
+
+logm() {        # brief graph with commit metadata
+    local sha='%C(auto)%h'
+    # Truncated relative works better for quick review than %ad
+    local date='%C(green)%<(12,trunc)%ar%C(auto)'
+    local author='%C(blue)%<(20,trunc)%ae%C(auto)'
+    local branches='%C(auto)% D'
+    local subject='%C(black)%+s'
+
+    local format="$sha $date $author$branches$subject"
+    logb --date='format-local:%m-%d %H:%M' --pretty="tformat:$format" "$@"
+}
+
+logmn() {       # logm without merges
+    logm --no-merges "$@"
+}
