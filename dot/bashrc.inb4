@@ -16,9 +16,9 @@ logm() {        # brief graph with commit metadata
     local sha='%C(auto)%h'
     # Truncated relative works better for quick review than %ad
     local date='%C(green)%<(12,trunc)%ar%C(auto)'
-    local author='%C(blue)%<(20,trunc)%ae%C(auto)'
+    local author='%C(black)%<(20,trunc)%ae%C(auto)'
     local branches='%C(auto)% D'
-    local subject='%C(black)%+s'
+    local subject='%n%C(blue)%s'
 
     local format="$sha $date $author$branches$subject"
     logb --date='format-local:%m-%d %H:%M' --pretty="tformat:$format" "$@"
