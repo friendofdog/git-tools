@@ -27,3 +27,21 @@ logm() {        # brief graph with commit metadata
 logmn() {       # logm without merges
     logm --no-merges "$@"
 }
+
+logs() {        # full paths of changed files
+    git log --stat=999 --stat-graph-width=5 "$@"
+}
+
+logp() {        # log with color word-diff patches
+                # changed paths are truncated in stat, full in diff
+    git log --stat -p --word-diff=color "$@"
+}
+
+logp1() {       # most recent patch
+    logp -1 "$@"
+}
+
+slp1() {        # most recent patch with leading blank lines for readability
+    local i; for i in 1 2 3 4 5; do echo; done
+    logp1 "$@"
+}
