@@ -1,6 +1,9 @@
 # These functions are almost invariably used only interactively,
 # thus they go into `.bashrc`.
 
+############################################################
+# git log
+
 logb() {        # brief graph of current or specified branches
     # Use `-S` in less to switch to wrapped lines instead of sideways scrolling
     LESS="$LESS -SR" \
@@ -44,4 +47,52 @@ logp1() {       # most recent patch
 slp1() {        # most recent patch with leading blank lines for readability
     local i; for i in 1 2 3 4 5; do echo; done
     logp1 "$@"
+}
+
+############################################################
+# git remote operations
+
+# Most of these are planned to have further additional functionality,
+# e.g., having `fetch` be able to take a list of paths to
+# repos/workdirs and fetch in each of them.
+
+rem()   { git remote "$@"; }
+
+# Given no args, fetch from remotes.default or, if not set, all remotes.
+# Otherwise fetch from all listed remotes/`remotes.<group>` entries.
+#
+fetch() {
+    git remote update "$@";
+}
+
+pull()  { git pull "$@"; }
+
+# Disallow use of -f and --force. If `pushf` doesn't work for you, you
+# can use `git push --force`.
+#
+push()          {
+    for i in "$@"; do case "$i" in
+        -f)      echo 1>&2 "Do not use -f option, use pushf"; return 1;;
+        --force) echo 1>&2 "Do not use --force option, use pushf"; return 1;;
+    esac; done
+    git push "$@";
+}
+
+pushf()         {
+    for i in "$@"; do case "$i" in
+        -f) echo 1>&2 "Do not use -f option, use --force"; return 1;;
+    esac; done
+    git push --force-with-lease "$@";
+}
+
+# Create upstream branch in remote.
+# XXX This should be able to figure out a default remote.
+#
+pushu()         {
+    # XXX This doesn't properly handle arguments before the <remote>
+    [ -z "$1" ] && { echo 1>&2 "Usage: pushu <remote> [<branch>]"; return 2; }
+    local -a argv=("$1"); shift
+    [ -z "$1" ] && argv+=($(git rev-parse --abbrev-ref=strict HEAD))
+    for i in "$@"; do argv+=("$i"); done
+    push --set-upstream "${argv[@]}"
 }
