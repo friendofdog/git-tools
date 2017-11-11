@@ -24,7 +24,7 @@ logm() {        # brief graph with commit metadata
     local subject='%n%C(blue)%s'
 
     local format="$sha $date $author$branches$subject"
-    logb --date='format-local:%m-%d %H:%M' --pretty="tformat:$format" "$@"
+    logb --pretty="tformat:$format" "$@"
 }
 
 logmn() {       # logm without merges
