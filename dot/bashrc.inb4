@@ -15,6 +15,16 @@ logab() {       # brief graph of all branches
     logb --all --exclude=refs/notes/* "$@"
 }
 
+logh() {        # the "head" of the repo
+    #   The idea is to get a quick overview of the relationships between
+    #   the tips of recent branches that are at least moderately closely
+    #   related to HEAD (or master?). This method of selecting the commits
+    #   and limiting the number shown could probably be improved. In
+    #   particular, it would be nice to show a bit of HEAD no matter how
+    #   old it is.
+    LESS="$LESS -E" logab --since '1 week ago' -n 30 "$@";
+}
+
 logm() {        # brief graph with commit metadata
     local sha='%C(auto)%h'
     # Truncated relative works better for quick review than %ad
