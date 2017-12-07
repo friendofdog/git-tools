@@ -66,7 +66,18 @@ slp1() {        # most recent patch with leading blank lines for readability
 # e.g., having `fetch` be able to take a list of paths to
 # repos/workdirs and fetch in each of them.
 
-rem()   { git remote "$@"; }
+rem()   {
+    if [[ ${#@} -gt 0 ]]; then
+        git remote "$@"
+    else
+        # List all remotes with their push URLs.
+        local rems
+        mapfile -t rems < <(git remote)
+        for rem in "${rems[@]}"; do
+            printf "%s %s\n" "$rem" "$(git remote get-url --push "$rem")"
+        done | column -t
+    fi
+}
 
 # Given no args, fetch from remotes.default or, if not set, all remotes.
 # Otherwise fetch from all listed remotes/`remotes.<group>` entries.
