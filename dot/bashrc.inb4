@@ -1,6 +1,18 @@
 # These functions are almost invariably used only interactively,
 # thus they go into `.bashrc`.
 
+#   Is Git version on this host >= given version?
+__git_tools_gitver_GE() {
+    local vs=($(git --version | sed -e 's/git version //' -e 's/\./ /g'))
+    local ws=($(echo "$@" | sed -e 's/\./ /g'))
+    # For `-lt`, empty string is 0
+    [[ ${vs[0]} -lt ${ws[0]} ]] && return 1
+    [[ ${vs[1]} -lt ${ws[1]} ]] && return 1
+    [[ ${vs[2]} -lt ${ws[2]} ]] && return 1
+    [[ ${vs[3]} -lt ${ws[3]} ]] && return 1
+    return 0
+}
+
 ############################################################
 # git log
 
@@ -11,8 +23,9 @@ logb() {        # brief graph of current or specified branches
 }
 
 logab() {       # brief graph of all branches
-    # XXX Needs to drop --exclude on earlier versions of Git
-    logb --all --exclude=refs/notes/* "$@"
+    local exclude_notes='--exclude=refs/notes/\*'
+    __git_tools_gitver_GE 1.8 || exclude_notes=
+    logb --all $exclude_notes "$@"
 }
 
 logh() {        # the "head" of the repo
