@@ -58,9 +58,9 @@ logs() {        # full paths of changed files
     git log --stat=999 --stat-graph-width=5 "$@"
 }
 
-logp() {        # log with color word-diff patches
+logp() {        # log with patches
                 # changed paths are truncated in stat, full in diff
-    git log --stat -p --word-diff=color "$@"
+    git log --stat -p "$@"
 }
 
 logp1() {       # most recent patch
