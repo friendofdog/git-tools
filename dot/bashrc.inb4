@@ -128,5 +128,6 @@ pushu()         {
     local -a argv=("$1"); shift
     [ -z "$1" ] && argv+=($(git rev-parse --abbrev-ref=strict HEAD))
     for i in "$@"; do argv+=("$i"); done
+    git branch --unset-upstream || true
     push --set-upstream "${argv[@]}"
 }
