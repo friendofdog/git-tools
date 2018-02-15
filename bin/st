@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+#  st - show status of one or more VCS checkouts or files in checkouts.
+#
+#  This command takes a list of paths, which is assumed to be "." if
+#  empty. If all paths given are within the same checkout or repository
+#  that the current working directory is in, a long-form VCs status
+#  message will be printed for those paths. Otherwise, a short-form VCS
+#  status message will be printed for each path.
+#
+
+. $(dirname $0)/vcs-functions
+
+summarize_cvs() {
+    echo " ?/ ? c  (XXX write me)"
+    # cvs -n update
+}
+
+summarize_git() {
+    (cd $1
+        branch=$(git branch -v | sed -n -e 's/^\* //p')
+        brname=$(echo "$branch" | sed -e 's/ .*//')
+        brstat=$(echo "$branch" | sed -e 's/^[^ ]* *[^ ]* *//')
+        echo "$brstat" | grep >/dev/null 2>&1 '\[' || brstat="   $brstat"
+        changed=$(  git status --porcelain | grep -v '^?' | wc -l)
+        untracked=$(git status --porcelain | grep    '^?' | wc -l)
+        printf "%2d/%2d g  %s %s\n" "$changed" "$untracked" "$brname" "$brstat"
+    )
+}
+
+summarize_hg() {
+    echo " ?/ ? h  (XXX write me)"
+    # hg status?
+}
+
+summarize_svn() {
+    echo " ?/ ? s  (XXX write me)"
+    # svn status?
+}
+
+status_summaries() {
+    path_len=$(for i in "$@"; do echo $i; done | wc -L)
+    for i in "$@"; do
+        local dir=$(echo $i | sed -e 's,/*$,,')
+        [[ _"$dir" == _-* ]] && continue
+        printf "%*s " $path_len "$dir"
+        [ -d "$dir" ] || { echo "      x"; continue; }
+        vcs=$(vcs_for_root "$dir")
+        [ -z "$vcs" ] && { echo "      d"; continue; }
+        printf "%s\n" "$(summarize_$vcs "$dir")" | cut -c -$((79-$path_len))
+    done
+}
+
+############################################################
+# Main
+
+this_root=$(vcs_root .)
+all_in_this_checkout=true
+for dir in "$@"; do
+    [[ _"$dir" == _-* ]] && continue
+    [ "$this_root" != "$(vcs_root "$dir")" ] \
+        && { all_in_this_checkout=false; break; }
+done
+
+if ! $all_in_this_checkout; then
+    status_summaries "$@"
+else
+    vcs=$(vcs_for_path .)
+    case $vcs in
+        '')     echo 1>&2 "No VCS for ."; exit 1 ;;
+        cvs)    cvs -n update "$@" ;;
+        git)    if git help status  | grep >/dev/null 2>&1 -- '--branch'
+                    then gitopts="-b"  # appeared after 1.7.0, but by 1.7.9.
+                    else git branch -vv | grep -F '*' | sed -e 's/^. //' \
+                         -e 's/].*//' -e 's/ .*\[/.../' -e 's/^/## /'; fi
+                $vcs status -s $gitopts "$@" ;;
+        *)      $vcs status "$@" ;;
+    esac
+fi
