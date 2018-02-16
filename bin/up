@@ -1,0 +1,74 @@
+#!/bin/sh -e
+
+options=''
+quiet=
+sync='-s'
+while true; do
+    case "$1" in
+        -)      sync=''; shift;;                        # nosync
+        -q)     options="$options -q"; shift; quiet=-q;;
+        -*)     options="$options $1"; shift;;          # option
+        *)      break;;                                 # start of args
+    esac
+done
+
+if [ -z "$1" ]; then
+    set .
+fi
+
+find_upwards() {
+    reldir=$(
+        while [ "$(/bin/pwd)" != / ]; do
+            if [ -e "$1" ]; then /bin/pwd; break; fi
+            cd ..
+        done
+    )
+    echo "$reldir"
+    [ -n "$reldir" ]
+}
+
+count=0; for file in "$@"; do count=$(($count +1)); done
+[ $count -gt 1 ] && quiet=-q
+
+failure=false
+for file in "$@"; do
+    if [ -f $file ]; then
+	dir=$(dirname $file)
+    else
+	dir=$file
+    fi
+
+    teefile=/dev/null
+    if [ -r $file/update.out ]; then teefile="$file/update.out"; fi
+
+    if (cd $dir && find_upwards .git >/dev/null); then (
+	cd $dir
+	revparse='git rev-parse --symbolic-full-name --short'
+	branch="$($revparse HEAD 2>/dev/null)" || true
+	upstream="$($revparse HEAD@{upstream} 2>/dev/null)" || true
+	echo "========== $file (git)" \
+	    "${branch#refs/heads/}...${upstream#refs/remotes/}"
+	git remote update || continue
+	current_branch=$(
+	    git symbolic-ref HEAD 2>/dev/null | sed -e 's,refs/heads/,,')
+	remote=$(git config branch.$current_branch.remote) || continue
+	remote_branch=$(git config branch.$current_branch.merge \
+	    | sed -e 's,refs/heads/,,') || continue
+	tracking_branch="remotes/$remote/$remote_branch"
+	git rebase $quiet $tracking_branch >/dev/null || {
+	    echo "---------- Aborting rebase."
+	    git rebase --abort
+	}
+    )
+    elif [ -f $dir/.svn/entries ]; then
+	echo "========== $file (svn)"
+	svn update $options $file 2>&1 | tee $teefile
+    elif [ -f $dir/CVS/Entries ]; then
+	echo "========== $file (CVS)"
+	(cd $dir; cvs -q update $options $(basename $file) | tee $teefile)
+    else
+	echo 1>&2 "Cannot determine VCS for this directory."
+	failure=true
+    fi
+done
+if $failure; then exit 1; fi
