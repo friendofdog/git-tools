@@ -212,6 +212,22 @@ stash()         { if [ "$1" = "" ]
 # e.g., having `fetch` be able to take a list of paths to
 # repos/workdirs and fetch in each of them.
 
+#   List fetch URLs for the repos given on the command line.
+#   Options:
+#       -o  Show `origin` push URL only
+gurl()  {
+    local origin_only=''
+    [[ $1 = -o ]] && { shift; origin_only='/^origin[[:space:]]/!d'; }
+    [[ -n $1 ]] || set .    # default arg
+    for dir in "$@"; do
+        git -C "$dir" remote -v | sed \
+            -e '/ (push)$/d' \
+            -e 's/ (fetch)$//' \
+            -e "$origin_only" \
+            -e 's/^[^[:blank:]]*[[:space:]]*//'
+    done
+}
+
 rem()   {
     if [[ ${#@} -gt 0 ]]; then
         git remote "$@"
