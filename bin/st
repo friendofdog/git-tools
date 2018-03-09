@@ -69,7 +69,7 @@ else
     case $vcs in
         '')     echo 1>&2 "No VCS for ."; exit 1 ;;
         cvs)    cvs -n update "$@" ;;
-        git)    if git help status  | grep >/dev/null 2>&1 -- '--branch'
+        git)    if git status -h 2>&1 | grep >/dev/null 2>&1 -- '--branch'
                     then gitopts="-b"  # appeared after 1.7.0, but by 1.7.9.
                     else git branch -vv | grep -F '*' | sed -e 's/^. //' \
                          -e 's/].*//' -e 's/ .*\[/.../' -e 's/^/## /'; fi
