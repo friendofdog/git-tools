@@ -229,6 +229,11 @@ gurl()  {
 }
 
 rem()   {
+    local format_table='column -t'
+    #   Without the `column` command (`bsdmainutils` package) we do a
+    #   fixed 12-column format for repo names, overflowing if necessary.
+    column </dev/null 2>/dev/null || format_table=cat
+
     if [[ ${#@} -gt 0 ]]; then
         git remote "$@"
     else
@@ -236,8 +241,8 @@ rem()   {
         local rems
         mapfile -t rems < <(git remote)
         for rem in "${rems[@]}"; do
-            printf "%s %s\n" "$rem" "$(git remote get-url --push "$rem")"
-        done | column -t
+            printf "%-12s %s\n" "$rem" "$(git remote get-url --push "$rem")"
+        done | $format_table
     fi
 }
 
