@@ -275,7 +275,8 @@ pushf()         {
     git push --force-with-lease "$@";
 }
 
-# Create upstream branch in remote.
+# Create upstream branch in given remote.
+# This will unset any current upstream, if present.
 # XXX This should be able to figure out a default remote.
 #
 pushu()         {
@@ -284,6 +285,6 @@ pushu()         {
     local -a argv=("$1"); shift
     [ -z "$1" ] && argv+=($(git rev-parse --abbrev-ref=strict HEAD))
     for i in "$@"; do argv+=("$i"); done
-    git branch --unset-upstream || true
+    git branch --unset-upstream 2>/dev/null || true
     push --set-upstream "${argv[@]}"
 }
