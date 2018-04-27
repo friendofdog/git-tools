@@ -250,7 +250,8 @@ rem()   {
 # Otherwise fetch from all listed remotes/`remotes.<group>` entries.
 #
 fetch() {
-    git remote update "$@";
+    git remote update "$@" || return
+    git status -bs
 }
 
 pull()  { git pull "$@"; }
