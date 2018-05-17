@@ -20,7 +20,11 @@ log()  { git log "$@"; }
 
 logbr() {
     local -a argv=("$@")
-    local branchref="${argv[-1]}"; unset 'argv[-1]'
+    local branchref=@
+    if [[ ${#argv[@]} -gt 0 ]] && [[ ${argv[-1]} != -* ]]; then
+        local branchref="${argv[-1]}"
+        unset 'argv[-1]'
+    fi
     log "${argv[@]}" $(mbase "$branchref").."$branchref"
 }
 
