@@ -18,6 +18,12 @@ __git_tools_gitver_GE() {
 
 log()  { git log "$@"; }
 
+logbr() {
+    local -a argv=("$@")
+    local branchref="${argv[-1]}"; unset 'argv[-1]'
+    log "${argv[@]}" $(mbase "$branchref").."$branchref"
+}
+
 logb() {        # brief graph of current or specified branches
     # Use `-S` in less to switch to wrapped lines instead of sideways scrolling
     LESS="$LESS -SR" \
