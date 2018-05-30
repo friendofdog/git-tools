@@ -25,7 +25,7 @@ logbr() {
         local branchref="${argv[-1]}"
         unset 'argv[-1]'
     fi
-    log "${argv[@]}" $(mbase "$branchref").."$branchref"
+    logs "${argv[@]}" $(mbase "$branchref").."$branchref"
 }
 
 logb() {        # brief graph of current or specified branches
