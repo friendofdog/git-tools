@@ -20,21 +20,30 @@ __git_tools_gitver_GE() {
 [ -f /usr/share/bash-completion/completions/git ] \
     && source /usr/share/bash-completion/completions/git
 
+__lookup_copy_git_completion_from() {
+    case "$1" in
+        log*) __copy_git_completion_from=(git log)    ;;
+         br*) __copy_git_completion_from=(git branch) ;;
+    esac
+}
+
+function __copy_git_completion {
+    local command="${COMP_WORDS[0]}"
+    local __copy_git_completion_from
+    __lookup_copy_git_completion_from "$command"
+
+    (( COMP_CWORD += 1 ))
+    COMP_WORDS=(${__copy_git_completion_from[@]} ${COMP_WORDS[@]:1})
+    (( COMP_POINT -= ${#COMP_LINE} ))
+    COMP_LINE=${COMP_LINE/$command/"${__copy_git_completion_from[*]}"}
+    (( COMP_POINT += ${#COMP_LINE} ))
+}
+
 copy_git_completion() {
     [ -f /usr/share/bash-completion/completions/git ] || return 0
     local command="$1"; shift
-    eval "
-        function __copy_git_completion::$command {
-            (( COMP_CWORD += 1 ))
-            COMP_WORDS=("$@" \${COMP_WORDS[@]:1})
-            (( COMP_POINT -= \${#COMP_LINE} ))
-            COMP_LINE=\${COMP_LINE/$command/"$@"}
-            (( COMP_POINT += \${#COMP_LINE} ))
-            __git_wrap__git_main
-        }
-    "
     complete -o bashdefault -o default -o nospace \
-        -F "__copy_git_completion::$command" "$command"
+        -F "__copy_git_completion" "$command"
 }
 
 ############################################################
