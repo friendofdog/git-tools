@@ -137,18 +137,18 @@ gk()            {
 co()        { git checkout "$@"; }; copy_git_completion co git checkout
 #complete -r co 2>/dev/null  # Perhaps not necessary given all options below?
 
-add()       { git add "$@"; }
+add()       { git add "$@"; }; copy_git_completion add git add
 
-com()       { git commit -v "$@"; }
+com()       { git commit -v "$@"; }; copy_git_completion com git commit
 coma()      {
                 # If we have changes staged in the index, assume we don't
                 # want to commit unstaged changes.
                 local _a=''
                 git diff-index --quiet --cached HEAD -- && _a='-a'
                 com $_a "$@";
-            }
-camend()    { com --amend "$@"; }
-cpick()     { git cherry-pick "$@"; }
+            }; copy_git_completion coma git commit
+camend()    { com --amend "$@"; }; copy_git_completion camend git commit
+cpick()     { git cherry-pick "$@"; }; copy_git_completion cpick git cherry-pick
 
 ############################################################
 # git branch
