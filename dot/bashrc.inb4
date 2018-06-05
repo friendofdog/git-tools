@@ -261,10 +261,14 @@ rem()   {
 # Given no args, fetch from remotes.default or, if not set, all remotes.
 # Otherwise fetch from all listed remotes/`remotes.<group>` entries.
 #
+# I'd like to turn off the noise of fetch-pack (and unpack-objects)
+# but --quiet here also turns off the names of the remotes being fetched
+# and the status lines showing changed refs.
+#
 fetch() {
-    git remote update "$@" || return
+    git fetch --all "$@" || return
     git status -bs
-}
+}; copy_git_completion fetch git fetch
 
 pull()  { git pull "$@"; }
 
