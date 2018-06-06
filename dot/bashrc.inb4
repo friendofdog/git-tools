@@ -132,7 +132,7 @@ gk()            {
 
 
 ############################################################
-# git checkout, stage, commit
+# git checkout, stage, commit, clean
 
 co()        { git checkout "$@"; }; copy_git_completion co git checkout
 #complete -r co 2>/dev/null  # Perhaps not necessary given all options below?
@@ -149,6 +149,19 @@ coma()      {
             }; copy_git_completion coma git commit
 camend()    { com --amend "$@"; }; copy_git_completion camend git commit
 cpick()     { git cherry-pick "$@"; }; copy_git_completion cpick git cherry-pick
+
+#   `git clean` with `-n` supplied for you unless you specify `-f`
+clean()     {
+    local noforce=-n
+    for arg in "$@"; do case "$arg" in
+        -*f*)  noforce=;;
+    esac; done
+    git clean $noforce "$@";
+}; copy_git_completion clean git clean
+
+#   Clean explicitly ignored files and directories
+iclean()    { clean -dX "$@"; }; copy_git_completion iclean git clean
+
 
 ############################################################
 # git branch
