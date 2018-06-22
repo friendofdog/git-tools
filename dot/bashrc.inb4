@@ -279,7 +279,12 @@ rem()   {
 # and the status lines showing changed refs.
 #
 fetch() {
-    git fetch --all "$@" || return
+    local allarg='--all'
+    for arg in "$@"; do
+        # Disable --all if repo specified (arg without leading `-`)
+        [[ ${arg#-} == $arg ]] && allarg=''
+    done
+    git fetch $allarg "$@" || return
     git status -bs
 }; copy_git_completion fetch git fetch
 
