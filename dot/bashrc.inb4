@@ -178,7 +178,7 @@ br() {
     # We can live with this here, since we expect none.
     git branch --color $bropts "$@" \
         | grep "${grep_args[@]:-.}" \
-        | less -E -R -S -J
+        | less -E -R -S -J -X
 }; copy_git_completion br git branch
 bra()           { br -a "$@"; }
 brag()          { br -a -g "$@"; }
