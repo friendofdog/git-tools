@@ -180,9 +180,9 @@ br() {
         | grep "${grep_args[@]:-.}" \
         | less -E -R -S -J -X
 }; copy_git_completion br git branch
-bra()           { br -a "$@"; }
-brag()          { br -a -g "$@"; }
-brv()           { br -v "$@"; }
+bra()           { br -a "$@"; };    copy_git_completion bra git branch
+brag()          { br -a -g "$@"; }; copy_git_completion brag git branch
+brv()           { br -v "$@"; };    copy_git_completion brv git branch
 
 
 mbase() {
@@ -209,13 +209,17 @@ grm()           { git rebase "$@" origin/master; }
 grabort()       { git rebase --abort "$@"; }
 grcontinue()    { git rebase --continue "$@"; }
 grskip()        { git rebase --skip "$@"; }
-grwhere()       { logb ORIG_HEAD HEAD --not $(git merge-base ORIG_HEAD HEAD)^; }
 gri()           {
     local arg=${1:-10}                  # default: 10 commits back
     [ $arg -lt 1000 ] 2>/dev/null \
         && git rebase -i "HEAD~$arg" \
         || git rebase -i "$arg^"
 }
+for f in gr grm grabort grcontinue grskip gri; do
+    copy_git_completion $f git rebase
+done
+
+grwhere()       { logb ORIG_HEAD HEAD --not $(git merge-base ORIG_HEAD HEAD)^; }
 
 gre()           { git reset "$@"; }
 grehard()       { git reset -q --hard "$@" \
@@ -223,12 +227,17 @@ grehard()       { git reset -q --hard "$@" \
                   && git reflog show -2 #'HEAD@{1}'
                 }
 greupstream()   { grehard '@{upstream}'; }
+for f in gre grehard greupstream; do
+    copy_git_completion $f git reset
+done
 
 stash()         { if [ "$1" = "" ]
                     then echo; git stash list
                     else git stash "$@"
                     fi
                 }
+copy_git_completion stash git stash
+
 
 ############################################################
 # git remote operations
