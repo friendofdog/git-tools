@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Takes a list of refs and runs `git log --graph` upto their common merge base.
+
+set -eu
+
+fatal() { echo "$@" >&2 ; exit 1 ; }
+
+[[ $# -lt 2 ]] && fatal "Usage: $0 rev1 rev2 [rev3 ...]"
+
+revs=( "$@" )
+mbase=${revs[1]}
+unset revs[1]
+for rev in $revs; do
+    mbase=$(git merge-base $rev $mbase \
+        || fatal "'$mbase' and '$rev' are in unrelated histories")
+done
+
+git log --graph --oneline ^$mbase^ $@
