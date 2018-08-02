@@ -205,7 +205,7 @@ mbase() {
 mergeff()       { git merge --ff-only "$@"; }   # Should be `integrate`?
 
 gr()            { git rebase "$@"; }
-grm()           { git rebase "$@" origin/master; }
+grmu()          { git rebase "$@" master@{upstream}; }
 grabort()       { git rebase --abort "$@"; }
 grcontinue()    { git rebase --continue "$@"; }
 grskip()        { git rebase --skip "$@"; }
