@@ -310,14 +310,14 @@ push()          {
         --force) echo 1>&2 "Do not use --force option, use pushf"; return 1;;
     esac; done
     git push "$@";
-}
+}; copy_git_completion push git push
 
 pushf()         {
     for i in "$@"; do case "$i" in
         -f) echo 1>&2 "Do not use -f option, use --force"; return 1;;
     esac; done
     git push --force-with-lease "$@";
-}
+}; copy_git_completion pushf git push
 
 # Create upstream branch in given remote.
 # This will unset any current upstream, if present.
@@ -331,4 +331,4 @@ pushu()         {
     for i in "$@"; do argv+=("$i"); done
     git branch --unset-upstream 2>/dev/null || true
     push --set-upstream "${argv[@]}"
-}
+}; copy_git_completion pushu git push
