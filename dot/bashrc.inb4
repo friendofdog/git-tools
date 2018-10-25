@@ -19,9 +19,11 @@ __git_tools_gitver_GE() {
 #   Ensure we have __git_wrap__git_main
 [ -f /usr/share/bash-completion/completions/git ] \
     && source /usr/share/bash-completion/completions/git
+[ -f /mingw64/share/git/completion/git-completion.bash ] \
+    && source /mingw64/share/git/completion/git-completion.bash
 
 copy_git_completion() {
-    [ -f /usr/share/bash-completion/completions/git ] || return 0
+    type -t __git_wrap__git_main >/dev/null || return 0
     local command="$1"; shift
     eval "
         function __copy_git_completion::$command {
