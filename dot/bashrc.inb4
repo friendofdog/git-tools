@@ -112,19 +112,19 @@ done
 ############################################################
 # git diff, other repo search/browse/etc. functions
 
-blame() { git blame "$@"; }
+blame() { git blame "$@"; }; copy_git_completion blame git blame
 
 slp1() {        # most recent patch with leading blank lines for readability
     local i; for i in 1 2 3 4 5; do echo; done
     logp1 "$@"
-}
+}; copy_git_completion slp1 git log
 
-dif()   { git diff "$@"; }
-difs()  { dif --cached "$@"; }          # `--staged` not in old Git versions
-dift()  { git difftool -y "$@"; }
+dif()   { git diff "$@"; }; copy_git_completion dif git diff
+difs()  { dif --cached "$@"; }; copy_git_completion difs git diff
+dift()  { git difftool -y "$@"; }; copy_git_completion dift git difftool
 
-ggrep()         { git grep "$@"; }
-gfgrep()        { ggrep -F "$@"; }
+ggrep()         { git grep "$@"; }; copy_git_completion ggrep git grep
+gfgrep()        { ggrep -F "$@"; }; copy_git_completion gfgrep git grep
 
 gk()            {
     [ -n "$1" ] && { start="--select-commit=$1"; shift; }
