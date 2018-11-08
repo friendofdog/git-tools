@@ -301,8 +301,6 @@ fetch() {
 
 pull()  { git pull "$@"; }; copy_git_completion pull git pull
 
-gprune()        { git remote prune "$@" $(git remote); }
-
 # Disallow use of -f and --force. If `pushf` doesn't work for you, you
 # can use `git push --force`.
 #
