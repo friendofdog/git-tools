@@ -164,6 +164,9 @@ clean()     {
 #   Clean explicitly ignored files and directories
 iclean()    { clean -dX "$@"; }; copy_git_completion iclean git clean
 
+gsub()      { git submodule "$@"; }
+copy_git_completion gsub git submodule
+
 
 ############################################################
 # git branch
