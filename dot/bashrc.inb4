@@ -55,8 +55,8 @@ logbr() {
 }
 
 logb() {        # brief graph of current or specified branches
-    # Use `-S` in less to switch to wrapped lines instead of sideways scrolling
-    LESS="$LESS -SR" \
+    # Display commits inline, abbreviated, wrapped, styled
+    LESS="$LESS -aeFimsXRS -j.15" \
     git log --graph --abbrev-commit --pretty=oneline --decorate=short "$@"
 }
 
